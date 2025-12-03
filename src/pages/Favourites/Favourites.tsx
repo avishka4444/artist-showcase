@@ -9,6 +9,10 @@ import {
 } from "@chakra-ui/react";
 import { Icon } from "@iconify/react";
 import { useStore } from "../../store/useStore";
+import { formatDuration } from "../../utils/formatUtils";
+import { PlayIcon } from "../../components/icons/PlayIcon";
+import { HeartIcon } from "../../components/icons/HeartIcon";
+import { ICON_SIZE_SMALL } from "../../constants";
 
 const Favourites = () => {
   const { favourites, removeFavourite } = useStore();
@@ -25,13 +29,6 @@ const Favourites = () => {
       ),
     [favourites, searchQuery]
   );
-
-  const formatDuration = (durationSeconds?: number): string => {
-    if (!durationSeconds || durationSeconds === 0) return "-";
-    const minutes = Math.floor(durationSeconds / 60);
-    const remainingSeconds = durationSeconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
 
   const handleTrackClick = (track: typeof favourites[0]) => {
     const encodedArtist = encodeURIComponent(track.artist);
@@ -89,85 +86,22 @@ const Favourites = () => {
           <Box as="table" width="100%" borderCollapse="collapse">
             <Box as="thead" bg="gray.100">
               <Box as="tr">
-                <Box
-                  as="th"
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 2, md: 3 }}
-                  textAlign="left"
-                  fontWeight="semibold"
-                  color="gray.700"
-                  borderBottom="1px solid"
-                  borderColor="gray.200"
-                  fontSize={{ base: "sm", md: "md" }}
-                >
+                <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="left" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }}>
                   Title
                 </Box>
-                <Box
-                  as="th"
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 2, md: 3 }}
-                  textAlign="left"
-                  fontWeight="semibold"
-                  color="gray.700"
-                  borderBottom="1px solid"
-                  borderColor="gray.200"
-                  fontSize={{ base: "sm", md: "md" }}
-                  display={{ base: "none", md: "table-cell" }}
-                >
+                <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="left" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }} display={{ base: "none", md: "table-cell" }}>
                   Album
                 </Box>
-                <Box
-                  as="th"
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 2, md: 3 }}
-                  textAlign="left"
-                  fontWeight="semibold"
-                  color="gray.700"
-                  borderBottom="1px solid"
-                  borderColor="gray.200"
-                  fontSize={{ base: "sm", md: "md" }}
-                >
+                <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="left" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }}>
                   Artist
                 </Box>
-                <Box
-                  as="th"
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 2, md: 3 }}
-                  textAlign="right"
-                  fontWeight="semibold"
-                  color="gray.700"
-                  borderBottom="1px solid"
-                  borderColor="gray.200"
-                  fontSize={{ base: "sm", md: "md" }}
-                  display={{ base: "none", lg: "table-cell" }}
-                >
+                <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="right" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }} display={{ base: "none", lg: "table-cell" }}>
                   Duration
                 </Box>
-                <Box
-                  as="th"
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 2, md: 3 }}
-                  textAlign="right"
-                  fontWeight="semibold"
-                  color="gray.700"
-                  borderBottom="1px solid"
-                  borderColor="gray.200"
-                  fontSize={{ base: "sm", md: "md" }}
-                  display={{ base: "none", lg: "table-cell" }}
-                >
+                <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="right" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }} display={{ base: "none", lg: "table-cell" }}>
                   Plays
                 </Box>
-                <Box
-                  as="th"
-                  px={{ base: 2, md: 4 }}
-                  py={{ base: 2, md: 3 }}
-                  textAlign="center"
-                  fontWeight="semibold"
-                  color="gray.700"
-                  borderBottom="1px solid"
-                  borderColor="gray.200"
-                  fontSize={{ base: "sm", md: "md" }}
-                >
+                <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="center" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }}>
                   Actions
                 </Box>
               </Box>
@@ -213,7 +147,7 @@ const Favourites = () => {
                     px={{ base: 2, md: 4 }}
                     py={{ base: 2, md: 3 }}
                     textAlign="center"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
                   >
                     <Box display="flex" gap={2} justifyContent="center">
                       <IconButton
@@ -224,17 +158,7 @@ const Favourites = () => {
                         borderRadius="md"
                         onClick={() => removeFavourite(track.name, track.artist)}
                       >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                          />
-                        </svg>
+                        <HeartIcon size={ICON_SIZE_SMALL} filled={true} />
                       </IconButton>
                       <IconButton
                         aria-label="Play track"
@@ -244,25 +168,14 @@ const Favourites = () => {
                         borderRadius="full"
                         border="1px solid"
                         borderColor="gray.300"
-                        onClick={(e) => {
+                        onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
                           if (track.url) {
                             window.open(track.url, "_blank");
                           }
                         }}
                       >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M8 5V19L19 12L8 5Z"
-                            fill="currentColor"
-                          />
-                        </svg>
+                        <PlayIcon size={ICON_SIZE_SMALL} />
                       </IconButton>
                     </Box>
                   </Box>

@@ -1,16 +1,16 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueries } from "@tanstack/react-query";
-import { Box, Grid, Image, Text, Spinner, Center, Heading, IconButton, Button, HStack, Input } from "@chakra-ui/react";
+import { Box, Grid, Text, Spinner, Center, Heading, Button, HStack, Input } from "@chakra-ui/react";
 import { Icon } from "@iconify/react";
 import { fetchArtistTopAlbums, fetchAlbumDetails } from "../../services/lastfm";
 import type { AlbumSummary } from "../../types/lastfm";
 import { useStore } from "../../store/useStore";
 import { handleApiError } from "../../utils/errorHandler";
+import { AlbumCard } from "../../components/AlbumCard/AlbumCard";
+import { ITEMS_PER_PAGE, MAX_ALBUMS_TO_FETCH_YEARS } from "../../constants";
 
 type SortOption = "name" | "year" | "default";
-
-const ITEMS_PER_PAGE = 20;
 
 const Home = () => {
   const { artist } = useStore();
@@ -29,7 +29,7 @@ const Home = () => {
     enabled: !!artist && artist.trim().length > 0,
   });
 
-  const albumsToFetchYears = albums.slice(0, 20);
+  const albumsToFetchYears = albums.slice(0, MAX_ALBUMS_TO_FETCH_YEARS);
   const yearQueries = useQueries({
     queries: albumsToFetchYears.map((album) => ({
       queryKey: ["albumDetails", album.artist, album.name],
@@ -38,6 +38,8 @@ const Home = () => {
       staleTime: Infinity,
     })),
   });
+
+  const isLoadingYears = yearQueries.some((query) => query.isLoading);
 
   const albumsWithYears = useMemo(() => {
     return albums.map((album, index) => {
@@ -57,12 +59,6 @@ const Home = () => {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
-  };
-
-  const getAlbumCover = (images: AlbumSummary["image"]) => {
-    const largeImage = images.find((img) => img.size === "large" || img.size === "extralarge");
-    const mediumImage = images.find((img) => img.size === "medium");
-    return largeImage?.["#text"] || mediumImage?.["#text"] || images[0]?.["#text"] || "";
   };
 
   const extractYear = (album: AlbumSummary): string | null => {
@@ -133,134 +129,11 @@ const Home = () => {
     navigate(`/album/${encodedArtist}/${encodedAlbum}`);
   };
 
-  const AlbumCard = ({ album, index, year, displayName, coverUrl }: { album: AlbumSummary; index: number; year: string | null; displayName: string; coverUrl: string }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    return (
-      <Box
-        key={`${album.name}-${index}`}
-        cursor="pointer"
-        transform={isHovered ? "scale(1.05)" : "scale(1)"}
-        transition="transform 0.3s ease"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={() => handleAlbumClick(album)}
-      >
-        <Box
-          bg="gray.100"
-          borderRadius="1rem"
-          overflow="hidden"
-          boxShadow={isHovered ? "xl" : "md"}
-          transition="box-shadow 0.3s ease"
-          mb={2}
-          position="relative"
-          width="100%"
-          paddingBottom="100%"
-        >
-          {coverUrl ? (
-            <Image
-              src={coverUrl}
-              alt={album.name}
-              position="absolute"
-              top="0"
-              left="0"
-              width="100%"
-              height="100%"
-              objectFit="cover"
-              borderRadius="1rem"
-              transition="all 0.3s ease"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = "none";
-                const fallback = target.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = "flex";
-              }}
-            />
-          ) : null}
-          <Box
-            bg="gray.200"
-            position="absolute"
-            top="0"
-            left="0"
-            width="100%"
-            height="100%"
-            display={coverUrl ? "none" : "flex"}
-            alignItems="center"
-            justifyContent="center"
-            borderRadius="1rem"
-          >
-            <Text color="gray.400" fontSize="2xl">
-              🎵
-            </Text>
-          </Box>
-          <Box
-            position="absolute"
-            bottom="12px"
-            right="12px"
-            opacity={isHovered ? 1 : 0}
-            transition="opacity 0.3s ease"
-            cursor="pointer"
-            onClick={(e) => handlePlayClick(album, e)}
-            zIndex={10}
-          >
-            <IconButton
-              aria-label="Play album"
-              bg="gray.400"
-              color="white"
-              borderRadius="full"
-              size="lg"
-              boxShadow="0 4px 12px rgba(0, 0, 0, 0.3)"
-              _hover={{
-                bg: "gray.500",
-                transform: "scale(1.1)",
-              }}
-              transition="all 0.2s ease"
-              width="45px"
-              height="45px"
-            >
-              <svg
-                width="30"
-                height="30"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 5V19L19 12L8 5Z"
-                  fill="black"
-                />
-              </svg>
-            </IconButton>
-          </Box>
-        </Box>
-        <Box>
-          <Text
-            fontWeight="semibold"
-            fontSize="sm"
-            color="gray.800"
-            mb={1}
-            style={{
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {displayName}
-          </Text>
-          {year && (
-            <Text fontSize="xs" color="gray.500">
-              {year}
-            </Text>
-          )}
-        </Box>
-      </Box>
-    );
-  };
 
-  if (isLoading) {
+  if (isLoading || isLoadingYears) {
     return (
       <Center minH="400px">
-        <Spinner size="xl" color="gray.500" />
+        <Spinner size="xl" color="gray.500" aria-label="Loading albums" />
       </Center>
     );
   }
@@ -268,7 +141,9 @@ const Home = () => {
   if (queryError) {
     return (
       <Center minH="400px">
-        <Text color="red.500">{handleApiError(queryError)}</Text>
+        <Text color="red.500" role="alert">
+          {handleApiError(queryError)}
+        </Text>
       </Center>
     );
   }
@@ -352,7 +227,6 @@ const Home = () => {
           gap={6}
         >
           {paginatedAlbums.map((album, index) => {
-            const coverUrl = getAlbumCover(album.image);
             const year = extractYear(album);
             const displayName = year && album.name.includes(`(${year})`) 
               ? album.name.replace(`(${year})`, "").trim() 
@@ -365,7 +239,8 @@ const Home = () => {
                 index={index}
                 year={year}
                 displayName={displayName}
-                coverUrl={coverUrl}
+                onAlbumClick={handleAlbumClick}
+                onPlayClick={handlePlayClick}
               />
             );
           })}

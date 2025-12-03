@@ -15,10 +15,15 @@ import {
   fetchAlbumDetails,
   fetchTrackInfo,
 } from "../../services/lastfm";
-import type { AlbumDetails } from "../../types/lastfm";
 import { useStore } from "../../store/useStore";
 import PlayCountGraph from "../../components/PlayCountGraph/PlayCountGraph";
 import { handleApiError } from "../../utils/errorHandler";
+import { formatDuration } from "../../utils/formatUtils";
+import { getAlbumCover } from "../../utils/albumUtils";
+import { PlayIcon } from "../../components/icons/PlayIcon";
+import { HeartIcon } from "../../components/icons/HeartIcon";
+import { MusicIcon } from "../../components/icons/MusicIcon";
+import { MAX_TRACKS_TO_FETCH_PLAYCOUNTS, ICON_SIZE_SMALL } from "../../constants";
 
 const AlbumDetail = () => {
   const { artist, albumName } = useParams<{
@@ -41,7 +46,7 @@ const AlbumDetail = () => {
     enabled: !!decodedArtist && !!decodedAlbum,
   });
 
-  const tracksToFetch = album?.tracks.slice(0, 20) ?? [];
+  const tracksToFetch = album?.tracks.slice(0, MAX_TRACKS_TO_FETCH_PLAYCOUNTS) ?? [];
   const playcountQueries = useQueries({
     queries: tracksToFetch.map((track) => ({
       queryKey: ["trackInfo", album?.artist, track.name],
@@ -60,25 +65,10 @@ const AlbumDetail = () => {
     return map;
   }, [playcountQueries]);
 
-  const formatDuration = (durationSeconds?: number): string => {
-    if (!durationSeconds || durationSeconds === 0) return "-";
-    const minutes = Math.floor(durationSeconds / 60);
-    const remainingSeconds = durationSeconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
-  const getAlbumCover = (images: AlbumDetails["image"]) => {
-    const largeImage = images.find(
-      (img) => img.size === "large" || img.size === "extralarge"
-    );
-    const mediumImage = images.find((img) => img.size === "medium");
-    return largeImage?.["#text"] || mediumImage?.["#text"] || images[0]?.["#text"] || "";
-  };
-
   if (isLoading) {
     return (
       <Center minH="400px">
-        <Spinner size="xl" color="gray.500" />
+        <Spinner size="xl" color="gray.500" aria-label="Loading album details" />
       </Center>
     );
   }
@@ -127,9 +117,7 @@ const AlbumDetail = () => {
               justifyContent="center"
               borderRadius="1rem"
             >
-              <Text color="gray.400" fontSize="4xl">
-                🎵
-              </Text>
+              <MusicIcon size="xl" />
             </Box>
           )}
         </Box>
@@ -190,71 +178,19 @@ const AlbumDetail = () => {
             <Box as="table" width="100%" borderCollapse="collapse">
               <Box as="thead" bg="gray.100">
                 <Box as="tr">
-                  <Box
-                    as="th"
-                    px={{ base: 2, md: 4 }}
-                    py={{ base: 2, md: 3 }}
-                    textAlign="left"
-                    fontWeight="semibold"
-                    color="gray.700"
-                    borderBottom="1px solid"
-                    borderColor="gray.200"
-                    fontSize={{ base: "sm", md: "md" }}
-                  >
+                  <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="left" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }}>
                     #
                   </Box>
-                  <Box
-                    as="th"
-                    px={{ base: 2, md: 4 }}
-                    py={{ base: 2, md: 3 }}
-                    textAlign="left"
-                    fontWeight="semibold"
-                    color="gray.700"
-                    borderBottom="1px solid"
-                    borderColor="gray.200"
-                    fontSize={{ base: "sm", md: "md" }}
-                  >
+                  <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="left" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }}>
                     Track
                   </Box>
-                  <Box
-                    as="th"
-                    px={{ base: 2, md: 4 }}
-                    py={{ base: 2, md: 3 }}
-                    textAlign="right"
-                    fontWeight="semibold"
-                    color="gray.700"
-                    borderBottom="1px solid"
-                    borderColor="gray.200"
-                    fontSize={{ base: "sm", md: "md" }}
-                    display={{ base: "none", lg: "table-cell" }}
-                  >
+                  <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="right" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }} display={{ base: "none", lg: "table-cell" }}>
                     Duration
                   </Box>
-                  <Box
-                    as="th"
-                    px={{ base: 2, md: 4 }}
-                    py={{ base: 2, md: 3 }}
-                    textAlign="right"
-                    fontWeight="semibold"
-                    color="gray.700"
-                    borderBottom="1px solid"
-                    borderColor="gray.200"
-                    fontSize={{ base: "sm", md: "md" }}
-                    display={{ base: "none", lg: "table-cell" }}
-                  >
+                  <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="right" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }} display={{ base: "none", lg: "table-cell" }}>
                     Plays
                   </Box>
-                  <Box
-                    as="th"
-                    px={{ base: 2, md: 4 }}
-                    py={{ base: 2, md: 3 }}
-                    textAlign="center"
-                    fontWeight="semibold"
-                    color="gray.700"
-                    borderBottom="1px solid"
-                    borderColor="gray.200"
-                    fontSize={{ base: "sm", md: "md" }}
-                  >
+                  <Box as="th" px={{ base: 2, md: 4 }} py={{ base: 2, md: 3 }} textAlign="center" fontWeight="semibold" color="gray.700" borderBottom="1px solid" borderColor="gray.200" fontSize={{ base: "sm", md: "md" }}>
                     Actions
                   </Box>
                 </Box>
@@ -327,7 +263,7 @@ const AlbumDetail = () => {
                             colorScheme={isFav ? "red" : "gray"}
                             variant="ghost"
                             borderRadius="md"
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent) => {
                               e.stopPropagation();
                               if (isFav) {
                                 removeFavourite(track.name, album.artist);
@@ -343,17 +279,7 @@ const AlbumDetail = () => {
                               }
                             }}
                           >
-                            <svg
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill={isFav ? "currentColor" : "none"}
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                            </svg>
+                            <HeartIcon size={ICON_SIZE_SMALL} filled={isFav} />
                           </IconButton>
                           <IconButton
                             aria-label="Play track"
@@ -363,23 +289,12 @@ const AlbumDetail = () => {
                             borderRadius="full"
                             border="1px solid"
                             borderColor="gray.300"
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent) => {
                               e.stopPropagation();
                               window.open(track.url, "_blank");
                             }}
                           >
-                            <svg
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M8 5V19L19 12L8 5Z"
-                                fill="currentColor"
-                              />
-                            </svg>
+                            <PlayIcon size={ICON_SIZE_SMALL} />
                           </IconButton>
                         </Box>
                       </Box>

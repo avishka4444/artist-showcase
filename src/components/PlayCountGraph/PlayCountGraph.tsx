@@ -1,6 +1,21 @@
 import { useMemo, memo } from "react";
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Heading, Text, useToken } from "@chakra-ui/react";
 import type { TrackSummary } from "../../types/lastfm";
+import {
+  GRAPH_BAR_HEIGHT,
+  GRAPH_BAR_SPACING,
+  GRAPH_RIGHT_PADDING,
+  GRAPH_TOP_PADDING,
+  GRAPH_BOTTOM_PADDING,
+  GRAPH_DEFAULT_WIDTH,
+  GRAPH_DEFAULT_HEIGHT,
+  GRAPH_DEFAULT_LEFT_PADDING,
+  GRAPH_MIN_WIDTH,
+  GRAPH_MIN_LEFT_PADDING,
+  GRAPH_CHAR_WIDTH_ESTIMATE,
+  GRAPH_CHAR_WIDTH_OFFSET,
+  MAX_TRACKS_FOR_GRAPH,
+} from "../../constants";
 
 interface PlayCountGraphProps {
   tracks: TrackSummary[];
@@ -11,11 +26,12 @@ const PlayCountGraph = memo(({
   tracks,
   tracksWithPlaycount,
 }: PlayCountGraphProps) => {
-  const barHeight = 30;
-  const barSpacing = 10;
-  const rightPadding = 100;
-  const topPadding = 20;
-  const bottomPadding = 20;
+  const [gray700, gray600, gray500] = useToken("colors", ["gray.700", "gray.600", "gray.500"]);
+  const barHeight = GRAPH_BAR_HEIGHT;
+  const barSpacing = GRAPH_BAR_SPACING;
+  const rightPadding = GRAPH_RIGHT_PADDING;
+  const topPadding = GRAPH_TOP_PADDING;
+  const bottomPadding = GRAPH_BOTTOM_PADDING;
 
   const tracksWithData = useMemo(
     () =>
@@ -27,26 +43,26 @@ const PlayCountGraph = memo(({
         }))
         .filter((t) => t.playcount > 0)
         .sort((a, b) => b.playcount - a.playcount)
-        .slice(0, 10),
+        .slice(0, MAX_TRACKS_FOR_GRAPH),
     [tracks, tracksWithPlaycount]
   );
 
   const { chartWidth, chartHeight, maxPlaycount, leftPadding } = useMemo(() => {
     if (tracksWithData.length === 0) {
       return {
-        chartWidth: 600,
-        chartHeight: 200,
+        chartWidth: GRAPH_DEFAULT_WIDTH,
+        chartHeight: GRAPH_DEFAULT_HEIGHT,
         maxPlaycount: 0,
-        leftPadding: 200,
+        leftPadding: GRAPH_DEFAULT_LEFT_PADDING,
       };
     }
 
     const max = Math.max(...tracksWithData.map((t) => t.playcount));
     const height = tracksWithData.length * (barHeight + barSpacing) + topPadding + bottomPadding;
     const maxNameLength = Math.max(...tracksWithData.map((t) => t.name.length));
-    const estimatedWidth = maxNameLength * 9 + 30;
-    const leftPad = Math.max(estimatedWidth, 300);
-    const width = Math.max(1200, leftPad + 600);
+    const estimatedWidth = maxNameLength * GRAPH_CHAR_WIDTH_ESTIMATE + GRAPH_CHAR_WIDTH_OFFSET;
+    const leftPad = Math.max(estimatedWidth, GRAPH_MIN_LEFT_PADDING);
+    const width = Math.max(GRAPH_MIN_WIDTH, leftPad + GRAPH_DEFAULT_WIDTH);
 
     return {
       chartWidth: width,
@@ -143,7 +159,7 @@ const PlayCountGraph = memo(({
                   y={y + barHeight / 2}
                   textAnchor="end"
                   fontSize="12"
-                  fill="gray.700"
+                  fill={gray700}
                   dominantBaseline="middle"
                   style={{ 
                     fontFamily: 'Arial, Helvetica, sans-serif',
@@ -158,7 +174,7 @@ const PlayCountGraph = memo(({
                   y={y + barHeight / 2}
                   textAnchor="start"
                   fontSize="11"
-                  fill="gray.600"
+                  fill={gray600}
                   dominantBaseline="middle"
                   fontWeight="medium"
                 >
@@ -179,7 +195,7 @@ const PlayCountGraph = memo(({
                 y={chartHeight - bottomPadding + 20}
                 textAnchor="middle"
                 fontSize="10"
-                fill="gray.500"
+                fill={gray500}
               >
                 {value.toLocaleString()}
               </text>
