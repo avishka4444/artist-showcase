@@ -70,7 +70,7 @@ const PlayCountGraph = memo(({
       maxPlaycount: max,
       leftPadding: leftPad,
     };
-  }, [tracksWithData]);
+  }, [barHeight, barSpacing, bottomPadding, topPadding, tracksWithData]);
 
   if (tracksWithData.length === 0) {
     return (

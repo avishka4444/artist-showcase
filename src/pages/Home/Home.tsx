@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { Box, Grid, Text, Spinner, Center, Heading, Button, HStack, Input } from "@chakra-ui/react";
@@ -103,9 +103,10 @@ const Home = () => {
     return albumsWithYears;
   }, [albumsWithYears, sortBy]);
 
-  useEffect(() => {
+  const handleSortChange = (newSortBy: SortOption) => {
+    setSortBy(newSortBy);
     setCurrentPage(1);
-  }, [sortBy]);
+  };
 
   // pagination
   const totalPages = Math.ceil(sortedAlbums.length / ITEMS_PER_PAGE);
@@ -185,7 +186,7 @@ const Home = () => {
             </Text>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              onChange={(e) => handleSortChange(e.target.value as SortOption)}
               style={{
                 padding: "8px 8px 8px 12px",
                 borderRadius: "6px",

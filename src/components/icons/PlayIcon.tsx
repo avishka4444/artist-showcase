@@ -1,5 +1,3 @@
-import { useToken } from "@chakra-ui/react";
-
 interface PlayIconProps {
   size?: number;
   fill?: string;
