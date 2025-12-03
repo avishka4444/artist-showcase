@@ -11,11 +11,6 @@ A modern React application built with TypeScript, Vite, Chakra UI, and Zustand.
 - **Zustand** - State management
 - **ESLint** - Code linting
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
 ## Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
@@ -49,7 +44,7 @@ Install all project dependencies using npm:
 npm install
 ```
 
-This will install all the required packages listed in `package.json`, including React, TypeScript, Vite, Chakra UI, and other dependencies.
+This will install all the required packages listed in `package.json`.
 
 ### 3. Environment Configuration
 
@@ -84,8 +79,6 @@ artist-showcase/
 ├── src/
 ├── public/
 ├── package.json
-├── vite.config.ts
-├── tsconfig.json
 └── .env
 ```
 
@@ -101,10 +94,7 @@ npm run dev
 
 The application will be available at `http://localhost:5173` (or another port if 5173 is occupied). The terminal will display the exact URL.
 
-The development server includes:
-- **Hot Module Replacement (HMR)** - Changes reflect instantly in the browser
-- **Fast Refresh** - React components update without losing state
-- **TypeScript type checking** - Errors are shown in the terminal
+Changes you make to the code will automatically reflect in the browser.
 
 ### Production Build
 
