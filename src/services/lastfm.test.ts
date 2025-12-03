@@ -7,10 +7,9 @@ import {
   fetchTrackInfo,
 } from './lastfm';
 import { ApiError } from '../utils/errorHandler';
-import type { AlbumSummary, TrackSummary, AlbumDetails } from '../types/lastfm';
 
 // Mock fetch globally
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 // Mock environment variable
 vi.stubEnv('VITE_LASTFM_API_KEY', 'test-api-key');
@@ -49,7 +48,7 @@ describe('lastfm service', () => {
         },
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -72,7 +71,7 @@ describe('lastfm service', () => {
         image: [],
       });
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         expect.stringContaining('method=artist.gettopalbums'),
         expect.any(Object)
       );
@@ -84,7 +83,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle missing topalbums data', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
       });
@@ -94,7 +93,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle missing album array', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ topalbums: {} }),
       });
@@ -104,7 +103,7 @@ describe('lastfm service', () => {
     });
 
     it('should normalize playcount from string to number', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           topalbums: {
@@ -126,7 +125,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle invalid playcount gracefully', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           topalbums: {
@@ -148,20 +147,20 @@ describe('lastfm service', () => {
     });
 
     it('should trim artist name', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ topalbums: { album: [] } }),
       });
 
       await fetchArtistTopAlbums('  The Beatles  ');
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         expect.stringContaining('artist=The+Beatles'),
         expect.any(Object)
       );
     });
 
     it('should handle API errors', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ error: 6, message: 'Invalid API key' }),
       });
@@ -172,7 +171,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle HTTP errors', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -216,7 +215,7 @@ describe('lastfm service', () => {
         },
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -243,7 +242,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle single track object (not array)', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           album: {
@@ -269,7 +268,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle missing tracks', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           album: {
@@ -296,7 +295,7 @@ describe('lastfm service', () => {
     });
 
     it('should return null when album is not found', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
       });
@@ -306,7 +305,7 @@ describe('lastfm service', () => {
     });
 
     it('should normalize duration from string to number', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           album: {
@@ -332,7 +331,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle invalid duration gracefully', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           album: {
@@ -358,7 +357,7 @@ describe('lastfm service', () => {
     });
 
     it('should extract year from published date', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           album: {
@@ -399,7 +398,7 @@ describe('lastfm service', () => {
         },
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -426,7 +425,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle missing trackmatches', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ results: {} }),
       });
@@ -436,7 +435,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle missing track array', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ results: { trackmatches: {} } }),
       });
@@ -463,7 +462,7 @@ describe('lastfm service', () => {
         },
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -490,7 +489,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle missing albummatches', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ results: {} }),
       });
@@ -509,7 +508,7 @@ describe('lastfm service', () => {
         },
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
       });
@@ -520,7 +519,7 @@ describe('lastfm service', () => {
     });
 
     it('should normalize playcount from string to number', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           track: {
@@ -535,7 +534,7 @@ describe('lastfm service', () => {
     });
 
     it('should return null when track is not found', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
       });
@@ -545,7 +544,7 @@ describe('lastfm service', () => {
     });
 
     it('should return null when playcount is missing', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           track: {
@@ -559,7 +558,7 @@ describe('lastfm service', () => {
     });
 
     it('should handle API errors gracefully and return null', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ error: 6, message: 'Invalid API key' }),
       });
@@ -569,14 +568,14 @@ describe('lastfm service', () => {
     });
 
     it('should handle network errors gracefully', async () => {
-      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+      (globalThis.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 
       const result = await fetchTrackInfo('Artist', 'Track');
       expect(result).toBeNull();
     });
 
     it('should handle invalid playcount gracefully', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (globalThis.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           track: {
@@ -603,7 +602,7 @@ describe('lastfm service', () => {
       ];
 
       for (const testCase of testCases) {
-        (global.fetch as any).mockResolvedValueOnce({
+        (globalThis.fetch as any).mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             topalbums: {
@@ -640,7 +639,7 @@ describe('lastfm service', () => {
       ];
 
       for (const testCase of testCases) {
-        (global.fetch as any).mockResolvedValueOnce({
+        (globalThis.fetch as any).mockResolvedValueOnce({
           ok: true,
           json: async () => ({
             album: {
@@ -673,22 +672,22 @@ describe('lastfm service', () => {
 
   describe('error handling', () => {
     it('should handle fetch timeout', async () => {
-      (global.fetch as any).mockImplementationOnce(() => {
+      (globalThis.fetch as any).mockImplementationOnce(() => {
         return new Promise((_, reject) => {
           setTimeout(() => reject(new Error('Aborted')), 100);
         });
       });
 
       // Mock AbortController
-      const originalAbortController = global.AbortController;
-      global.AbortController = vi.fn(() => ({
+      const originalAbortController = globalThis.AbortController;
+      globalThis.AbortController = vi.fn(() => ({
         abort: vi.fn(),
         signal: {} as AbortSignal,
       })) as any;
 
       await expect(fetchArtistTopAlbums('The Beatles')).rejects.toThrow();
 
-      global.AbortController = originalAbortController;
+      globalThis.AbortController = originalAbortController;
     });
 
     it('should handle missing API key', async () => {
